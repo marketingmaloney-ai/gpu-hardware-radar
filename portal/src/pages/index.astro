@@ -1,0 +1,344 @@
+---
+import Layout from '../layouts/Layout.astro';
+import DealCard from '../components/DealCard.astro';
+import QuickViewDrawer from '../components/QuickViewDrawer.astro';
+import BestDealsSection from '../components/BestDealsSection.astro';
+import fs from 'fs';
+import path from 'path';
+
+const dealsPath = path.resolve('../data/deals.json');
+const bestDealsPath = path.resolve('../data/clark_best_deals.json');
+const compPath = path.resolve('../data/comparisons.json');
+
+let deals = [];
+let bestDealsData = [];
+let comparisons = [];
+
+if (fs.existsSync(dealsPath)) {
+  deals = JSON.parse(fs.readFileSync(dealsPath, 'utf-8'));
+}
+if (fs.existsSync(bestDealsPath)) {
+  bestDealsData = JSON.parse(fs.readFileSync(bestDealsPath, 'utf-8'));
+}
+if (fs.existsSync(compPath)) {
+  comparisons = JSON.parse(fs.readFileSync(compPath, 'utf-8'));
+}
+
+const categories = [
+  { id: 'nvidia-rtx-gpus', name: 'NVIDIA RTX GPUs', count: deals.filter((d: any) => d.category === 'nvidia-rtx-gpus').length },
+  { id: 'amd-radeon-gpus', name: 'AMD Radeon GPUs', count: deals.filter((d: any) => d.category === 'amd-radeon-gpus').length },
+  { id: 'cpus-processors', name: 'Desktop CPUs', count: deals.filter((d: any) => d.category === 'cpus-processors').length },
+  { id: 'motherboards-ram', name: 'Motherboards & RAM', count: deals.filter((d: any) => d.category === 'motherboards-ram').length },
+  { id: 'psus-cases', name: 'PSUs & Cases', count: deals.filter((d: any) => d.category === 'psus-cases').length },
+  { id: 'cooling-nvme-ssds', name: 'Cooling & SSDs', count: deals.filter((d: any) => d.category === 'cooling-nvme-ssds').length }
+];
+
+const brands = [...new Set(deals.map((d: any) => d.brand))].slice(0, 10);
+---
+
+<Layout title="Verified GPU & PC Hardware Deals | 90-Day Historic Lows">
+
+  <div class="px-4 sm:px-6 py-6">
+    
+    <!-- Hero / Header Summary -->
+    <div class="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-6">
+      <div>
+        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-50 border border-indigo-200/60 text-indigo-800 text-xs font-bold mb-2">
+          <span class="w-2 h-2 rounded-full bg-indigo-500 animate-pulse"></span>
+          <span>Amazon API Live Sync: Verified Discounts Only</span>
+        </div>
+        <h1 class="font-heading font-black text-3xl sm:text-4xl text-slate-900 tracking-tight">
+          Explore Verified Hardware Price Drops
+        </h1>
+        <p class="text-sm text-slate-500 mt-1 max-w-2xl">
+          Scanning Amazon for verified 90-day historic lows and genuine discounts on NVIDIA RTX 40-series, AMD Radeon, Ryzen CPUs, and high-performance PC hardware.
+        </p>
+      </div>
+
+      <!-- Live Stats Pill -->
+      <div class="flex items-center gap-3 text-xs bg-slate-50 p-2.5 rounded-2xl border border-slate-200/80">
+        <div>
+          <span class="text-slate-400 font-bold block text-[10px] uppercase">Active Catalog</span>
+          <span class="font-heading font-black text-slate-800 text-sm">{deals.length} Hardware Deals</span>
+        </div>
+        <div class="h-6 w-px bg-slate-200"></div>
+        <div>
+          <span class="text-indigo-600 font-bold block text-[10px] uppercase">Avg Discount</span>
+          <span class="font-heading font-black text-indigo-700 text-sm">-$115.00+</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Curated Staff Picks Showcase Banner -->
+    <BestDealsSection />
+
+    <!-- 2-Column App-Style Layout: Left Sidebar + Right 5-Column Portrait Grid -->
+    <div class="flex flex-col lg:flex-row gap-8 items-start">
+      
+      <!-- ── LEFT SIDEBAR FILTERS (Sticky) ── -->
+      <aside class="w-full lg:w-64 flex-shrink-0 lg:sticky lg:top-20 space-y-6">
+        
+        <!-- Feed Navigation -->
+        <div class="text-[10px] font-black uppercase tracking-wider text-slate-400 px-3">
+          Explore Feed
+        </div>
+
+        <nav class="space-y-1 text-xs font-semibold text-slate-600">
+          <button 
+            id="filter-all-btn"
+            class="w-full flex items-center justify-between px-3 py-2 rounded-xl bg-indigo-50 text-indigo-800 font-bold transition-colors text-left"
+          >
+            <span>All Hardware Deals</span>
+            <span class="w-2 h-2 rounded-full bg-indigo-500"></span>
+          </button>
+
+          <button 
+            id="filter-deep-btn"
+            class="w-full flex items-center justify-between px-3 py-2 rounded-xl hover:bg-slate-100 text-slate-700 transition-colors text-left"
+          >
+            <span>Deepest Drops (20%+ Off)</span>
+            <span class="text-[10px] font-bold text-indigo-600">🔥</span>
+          </button>
+
+          <a 
+            href="/best-deals"
+            class="w-full flex items-center justify-between px-3 py-2 rounded-xl hover:bg-slate-100 text-slate-800 transition-colors text-left font-bold"
+          >
+            <span>Staff Picks</span>
+            <span class="text-[9px] uppercase tracking-wider bg-slate-100 text-slate-600 px-1.5 py-0.5 rounded font-black">{bestDealsData.length} Curated</span>
+          </a>
+
+          <a 
+            href="/lightning-deals"
+            class="w-full flex items-center justify-between px-3 py-2 rounded-xl hover:bg-amber-50 text-amber-600 transition-colors text-left font-extrabold"
+          >
+            <span>Lightning Deals</span>
+            <span class="text-[9px] uppercase tracking-wider bg-amber-100 text-amber-700 px-1.5 py-0.5 rounded font-black">Live</span>
+          </a>
+
+          <a 
+            href="https://amzn.to/3V4zU40" 
+            target="_blank" 
+            rel="nofollow noopener"
+            class="w-full flex items-center justify-between px-3 py-2 rounded-xl hover:bg-slate-100 text-slate-800 transition-colors text-left font-bold"
+          >
+            <span>Amazon Haul</span>
+            <span class="text-[10px] text-slate-400">↗</span>
+          </a>
+        </nav>
+
+        <!-- Categories Navigation -->
+        <div class="text-[10px] font-black uppercase tracking-wider text-slate-400 px-3 pt-3 border-t border-slate-100">
+          Hardware Hubs ({categories.length})
+        </div>
+
+        <nav class="space-y-0.5 text-xs font-semibold text-slate-600" id="category-nav">
+          {categories.map((cat) => (
+            <button 
+              data-category-id={cat.id}
+              class="category-filter-btn w-full flex items-center justify-between px-3 py-2 rounded-xl hover:bg-slate-100 text-slate-700 transition-colors text-left"
+            >
+              <span>{cat.name}</span>
+              <span class="text-[10px] text-slate-400 font-bold bg-slate-100 px-1.5 py-0.2 rounded">{cat.count}</span>
+            </button>
+          ))}
+        </nav>
+
+        <!-- Versus Hubs Quick Link -->
+        <div class="p-4 bg-slate-50 border border-slate-200/80 rounded-2xl space-y-2">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-bold text-slate-900">Versus Hubs</span>
+            <span class="text-[9px] bg-indigo-100 text-indigo-800 font-black px-1.5 py-0.5 rounded">{comparisons.length} Matchups</span>
+          </div>
+          <p class="text-[11px] text-slate-500">
+            Compare specs, benchmark prices & live savings side-by-side.
+          </p>
+          <a 
+            href="/compare" 
+            class="block text-center text-xs font-bold text-indigo-600 hover:text-indigo-700 pt-1"
+          >
+            Open Showdowns →
+          </a>
+        </div>
+
+        <!-- Featured Hardware Brands -->
+        <div class="text-[10px] font-black uppercase tracking-wider text-slate-400 px-3 pt-3 border-t border-slate-100">
+          Top Hardware Brands
+        </div>
+        <div class="flex flex-wrap gap-1.5 px-2">
+          {brands.map((b: string) => (
+            <button 
+              data-brand-name={b.toLowerCase()}
+              class="brand-filter-btn text-[11px] font-bold text-slate-600 bg-slate-100 hover:bg-indigo-50 hover:text-indigo-700 px-2.5 py-1 rounded-lg transition-colors"
+            >
+              @{b.toLowerCase()}
+            </button>
+          ))}
+        </div>
+
+      </aside>
+
+      <!-- ── RIGHT MAIN FEED (5-Column Grid) ── -->
+      <section class="flex-1 w-full">
+        
+        <!-- Controls / Search / Sort -->
+        <div class="flex flex-col sm:flex-row items-center justify-between gap-4 mb-6 pb-4 border-b border-slate-100">
+          <div class="text-xs font-bold text-slate-500">
+            Showing <span id="visible-deal-count" class="text-slate-900 font-black">{deals.length}</span> verified deals
+          </div>
+
+          <div class="flex items-center gap-3 w-full sm:w-auto">
+            <label class="text-xs font-bold text-slate-500">Sort By:</label>
+            <select 
+              id="sort-select"
+              class="text-xs bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 font-bold text-slate-700 outline-none focus:border-indigo-500"
+            >
+              <option value="discount_desc">Highest % Discount</option>
+              <option value="savings_desc">Biggest Dollar Savings ($)</option>
+              <option value="price_asc">Price: Low to High</option>
+              <option value="price_desc">Price: High to Low</option>
+              <option value="radar_desc">Highest Radar Score</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- 5-Column Vertical Card Grid -->
+        <div id="deals-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-5 gap-4">
+          {deals.map((deal: any) => (
+            <DealCard deal={deal} />
+          ))}
+        </div>
+
+        <!-- Empty State (hidden by default) -->
+        <div id="empty-state" class="hidden py-16 text-center">
+          <div class="text-3xl mb-2">🔍</div>
+          <h3 class="font-heading font-black text-lg text-slate-800">No hardware deals match this filter</h3>
+          <p class="text-xs text-slate-500 mt-1">Try resetting your category or search query.</p>
+          <button id="reset-filter-btn" class="mt-4 px-4 py-2 bg-indigo-600 text-white font-bold text-xs rounded-xl shadow-xs">
+            Reset Filters
+          </button>
+        </div>
+
+      </section>
+
+    </div>
+
+  </div>
+
+  <!-- QuickView Side Drawer Modal -->
+  <QuickViewDrawer />
+
+</Layout>
+
+<script is:inline>
+  function initFeedFiltering() {
+    const grid = document.getElementById('deals-grid');
+    const emptyState = document.getElementById('empty-state');
+    const countEl = document.getElementById('visible-deal-count');
+    const sortSelect = document.getElementById('sort-select');
+    const cards = Array.from(document.querySelectorAll('.deal-card-item'));
+
+    const allBtn = document.getElementById('filter-all-btn');
+    const deepBtn = document.getElementById('filter-deep-btn');
+    const catBtns = document.querySelectorAll('.category-filter-btn');
+    const brandBtns = document.querySelectorAll('.brand-filter-btn');
+    const resetBtn = document.getElementById('reset-filter-btn');
+
+    let activeCategory = null;
+    let activeBrand = null;
+    let deepDiscountOnly = false;
+
+    function renderFilter() {
+      let visible = 0;
+
+      cards.forEach(card => {
+        const cat = card.dataset.category;
+        const brand = card.dataset.brand ? card.dataset.brand.toLowerCase() : '';
+        const discount = parseFloat(card.dataset.discount) || 0;
+
+        let show = true;
+        if (activeCategory && cat !== activeCategory) show = false;
+        if (activeBrand && brand !== activeBrand) show = false;
+        if (deepDiscountOnly && discount < 20) show = false;
+
+        if (show) {
+          card.style.display = 'flex';
+          visible++;
+        } else {
+          card.style.display = 'none';
+        }
+      });
+
+      if (countEl) countEl.innerText = visible;
+      if (emptyState && grid) {
+        if (visible === 0) {
+          emptyState.classList.remove('hidden');
+          grid.classList.add('hidden');
+        } else {
+          emptyState.classList.add('hidden');
+          grid.classList.remove('hidden');
+        }
+      }
+    }
+
+    allBtn?.addEventListener('click', () => {
+      activeCategory = null;
+      activeBrand = null;
+      deepDiscountOnly = false;
+      renderFilter();
+    });
+
+    deepBtn?.addEventListener('click', () => {
+      deepDiscountOnly = !deepDiscountOnly;
+      renderFilter();
+    });
+
+    catBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        const cid = btn.dataset.categoryId;
+        activeCategory = (activeCategory === cid) ? null : cid;
+        renderFilter();
+      });
+    });
+
+    brandBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        const bname = btn.dataset.brandName;
+        activeBrand = (activeBrand === bname) ? null : bname;
+        renderFilter();
+      });
+    });
+
+    resetBtn?.addEventListener('click', () => {
+      activeCategory = null;
+      activeBrand = null;
+      deepDiscountOnly = false;
+      renderFilter();
+    });
+
+    sortSelect?.addEventListener('change', (e) => {
+      const mode = e.target.value;
+      const sorted = cards.sort((a, b) => {
+        const priceA = parseFloat(a.dataset.price) || 0;
+        const priceB = parseFloat(b.dataset.price) || 0;
+        const discA = parseFloat(a.dataset.discount) || 0;
+        const discB = parseFloat(b.dataset.discount) || 0;
+        const savA = parseFloat(a.dataset.savings) || 0;
+        const savB = parseFloat(b.dataset.savings) || 0;
+        const scoreA = parseFloat(a.dataset.score) || 0;
+        const scoreB = parseFloat(b.dataset.score) || 0;
+
+        if (mode === 'discount_desc') return discB - discA;
+        if (mode === 'savings_desc') return savB - savA;
+        if (mode === 'price_asc') return priceA - priceB;
+        if (mode === 'price_desc') return priceB - priceA;
+        if (mode === 'radar_desc') return scoreB - scoreA;
+        return 0;
+      });
+
+      sorted.forEach(card => grid?.appendChild(card));
+    });
+  }
+
+  document.addEventListener('DOMContentLoaded', initFeedFiltering);
+</script>

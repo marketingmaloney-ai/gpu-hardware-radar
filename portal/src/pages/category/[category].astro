@@ -1,0 +1,72 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import DealCard from '../../components/DealCard.astro';
+import QuickViewDrawer from '../../components/QuickViewDrawer.astro';
+import fs from 'fs';
+import path from 'path';
+
+export async function getStaticPaths() {
+  const dealsPath = path.resolve('../data/deals.json');
+  let deals = [];
+  if (fs.existsSync(dealsPath)) {
+    deals = JSON.parse(fs.readFileSync(dealsPath, 'utf-8'));
+  }
+
+  const categories = [
+    { id: 'nvidia-rtx-gpus', name: 'NVIDIA GeForce RTX GPUs', desc: 'Verified price drops on RTX 4090, 4080 Super, 4070 Ti Super, and 4070 series.' },
+    { id: 'amd-radeon-gpus', name: 'AMD Radeon RX GPUs', desc: 'Verified price drops on RX 7900 XTX, 7900 XT, 7800 XT, and 7700 XT graphics cards.' },
+    { id: 'cpus-processors', name: 'Desktop Processors & CPUs', desc: 'Verified price drops on AMD Ryzen 9/7/5 X3D and Intel Core i9/i7/i5 CPUs.' },
+    { id: 'motherboards-ram', name: 'Motherboards & DDR5 RAM', desc: 'Verified price drops on X670E, B650, Z790 motherboards and DDR5 memory.' },
+    { id: 'psus-cases', name: 'Power Supplies & PC Cases', desc: 'Verified price drops on ATX 3.0 Gold/Platinum PSUs and high-airflow gaming cases.' },
+    { id: 'cooling-nvme-ssds', name: 'AIO Liquid Cooling & Fast SSDs', desc: 'Verified price drops on 360mm liquid AIO coolers and Gen4/Gen5 NVMe SSDs.' }
+  ];
+
+  return categories.map(cat => ({
+    params: { category: cat.id },
+    props: { 
+      category: cat,
+      categoryDeals: deals.filter((d: any) => d.category === cat.id)
+    }
+  }));
+}
+
+const { category, categoryDeals } = Astro.props;
+---
+
+<Layout title={`${category.name} Deals & 90-Day Lows | GPU Hardware Radar`}>
+  
+  <div class="max-w-[1440px] mx-auto px-4 sm:px-6 py-8">
+    
+    <!-- Breadcrumb -->
+    <nav class="flex items-center gap-2 text-xs font-bold text-slate-400 mb-6">
+      <a href="/" class="hover:text-slate-800">Home</a>
+      <span>/</span>
+      <span class="text-indigo-600">{category.name}</span>
+    </nav>
+
+    <!-- Header -->
+    <div class="p-8 bg-slate-900 text-white rounded-3xl mb-8 flex flex-col md:flex-row md:items-center justify-between gap-6">
+      <div>
+        <div class="text-xs font-bold uppercase tracking-wider text-indigo-400 mb-1">Department Hub</div>
+        <h1 class="font-heading font-black text-3xl sm:text-4xl text-white">{category.name}</h1>
+        <p class="text-xs sm:text-sm text-slate-400 mt-2 max-w-2xl">{category.desc}</p>
+      </div>
+
+      <div class="bg-slate-800 px-4 py-3 rounded-2xl border border-slate-700 text-center flex-shrink-0">
+        <span class="text-[10px] uppercase font-bold text-slate-400 block">Catalog Scale</span>
+        <span class="font-heading font-black text-2xl text-white">{categoryDeals.length} Deals</span>
+      </div>
+    </div>
+
+    <!-- Deals Grid -->
+    <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-5 gap-4">
+      {categoryDeals.map((deal: any) => (
+        <DealCard deal={deal} />
+      ))}
+    </div>
+
+  </div>
+
+  <QuickViewDrawer />
+
+</Layout>

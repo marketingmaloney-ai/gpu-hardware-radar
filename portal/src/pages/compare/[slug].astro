@@ -1,0 +1,160 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import fs from 'fs';
+import path from 'path';
+
+export async function getStaticPaths() {
+  const compPath = path.resolve('../data/comparisons.json');
+  let comparisons = [];
+  if (fs.existsSync(compPath)) {
+    comparisons = JSON.parse(fs.readFileSync(compPath, 'utf-8'));
+  }
+
+  return comparisons.map((comp: any) => ({
+    params: { slug: comp.slug },
+    props: { comp }
+  }));
+}
+
+const { comp } = Astro.props;
+const a = comp.product_a;
+const b = comp.product_b;
+
+function formatPrice(val: number) {
+  if (val === undefined || val === null || isNaN(val)) return '0.00';
+  return val % 1 === 0 ? val.toString() : val.toFixed(2);
+}
+---
+
+<Layout title={`${comp.title} - Hardware Head-to-Head Comparison`}>
+  
+  <div class="max-w-[1280px] mx-auto px-4 sm:px-6 py-8">
+    
+    <!-- Breadcrumb -->
+    <nav class="flex items-center gap-2 text-xs font-bold text-slate-400 mb-6">
+      <a href="/" class="hover:text-slate-800">Home</a>
+      <span>/</span>
+      <a href="/compare" class="hover:text-slate-800">Versus Hubs</a>
+      <span>/</span>
+      <span class="text-indigo-600 truncate">{comp.title}</span>
+    </nav>
+
+    <!-- Matchup Title -->
+    <div class="mb-10 text-center max-w-2xl mx-auto">
+      <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-indigo-50 text-indigo-700 text-xs font-bold mb-3">
+        <span>⚔️</span>
+        <span>{comp.category_name} Showdown</span>
+      </div>
+      <h1 class="font-heading font-black text-3xl sm:text-4xl text-slate-900 leading-tight">
+        {comp.title}
+      </h1>
+      <p class="text-xs sm:text-sm text-slate-500 mt-2">
+        Direct side-by-side comparison of live pricing, MSRP benchmark value, and hardware discount depth.
+      </p>
+    </div>
+
+    <!-- 2 Product Cards Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
+      
+      <!-- Product A Card -->
+      <div class="bg-white border-2 border-slate-200/80 rounded-3xl p-6 sm:p-8 flex flex-col justify-between shadow-sm">
+        <div>
+          <div class="flex items-center justify-between text-xs font-bold text-slate-400 uppercase mb-4">
+            <span>Contender A</span>
+            <span class="bg-[#131921] text-indigo-400 font-black px-2 py-0.5 rounded">{a.radar_score}/100 Score</span>
+          </div>
+
+          <div class="aspect-video sm:aspect-square bg-slate-50 rounded-2xl p-6 mb-6 flex items-center justify-center">
+            <img src={a.image_url} alt={a.title} class="max-h-full max-w-full object-contain" />
+          </div>
+
+          <h2 class="font-heading font-black text-xl text-slate-900 mb-2 leading-snug">{a.title}</h2>
+          <div class="text-xs font-bold text-slate-400 uppercase mb-6">@{a.brand.toLowerCase()} • {a.rating}★ ({a.review_count} ratings)</div>
+
+          <!-- Price Box -->
+          <div class="bg-slate-50 p-4 rounded-2xl border border-slate-200/80 space-y-2 mb-6">
+            <div class="flex items-baseline justify-between">
+              <span class="text-xs font-bold text-slate-500">Live Buy-Box:</span>
+              <span class="font-heading font-black text-2xl text-slate-900">${formatPrice(a.current_price)}</span>
+            </div>
+            <div class="flex items-baseline justify-between text-xs">
+              <span class="text-slate-400">Regular MSRP:</span>
+              <span class="line-through text-slate-400 font-bold">${formatPrice(a.regular_price)}</span>
+            </div>
+            <div class="flex items-baseline justify-between text-xs font-bold text-indigo-700 pt-2 border-t border-slate-200">
+              <span>Savings:</span>
+              <span>Save ${formatPrice(a.savings)} ({a.discount_pct}% Off)</span>
+            </div>
+          </div>
+        </div>
+
+        <a 
+          href={a.affiliate_url}
+          target="_blank"
+          rel="nofollow noopener"
+          class="w-full bg-[#131921] hover:bg-slate-800 text-white font-heading font-black text-sm py-3.5 px-6 rounded-xl flex items-center justify-center gap-2 transition-all"
+        >
+          <span>View {a.brand} Deal on Amazon</span>
+          <span>→</span>
+        </a>
+      </div>
+
+      <!-- Product B Card -->
+      <div class="bg-white border-2 border-slate-200/80 rounded-3xl p-6 sm:p-8 flex flex-col justify-between shadow-sm">
+        <div>
+          <div class="flex items-center justify-between text-xs font-bold text-slate-400 uppercase mb-4">
+            <span>Contender B</span>
+            <span class="bg-[#131921] text-indigo-400 font-black px-2 py-0.5 rounded">{b.radar_score}/100 Score</span>
+          </div>
+
+          <div class="aspect-video sm:aspect-square bg-slate-50 rounded-2xl p-6 mb-6 flex items-center justify-center">
+            <img src={b.image_url} alt={b.title} class="max-h-full max-w-full object-contain" />
+          </div>
+
+          <h2 class="font-heading font-black text-xl text-slate-900 mb-2 leading-snug">{b.title}</h2>
+          <div class="text-xs font-bold text-slate-400 uppercase mb-6">@{b.brand.toLowerCase()} • {b.rating}★ ({b.review_count} ratings)</div>
+
+          <!-- Price Box -->
+          <div class="bg-slate-50 p-4 rounded-2xl border border-slate-200/80 space-y-2 mb-6">
+            <div class="flex items-baseline justify-between">
+              <span class="text-xs font-bold text-slate-500">Live Buy-Box:</span>
+              <span class="font-heading font-black text-2xl text-slate-900">${formatPrice(b.current_price)}</span>
+            </div>
+            <div class="flex items-baseline justify-between text-xs">
+              <span class="text-slate-400">Regular MSRP:</span>
+              <span class="line-through text-slate-400 font-bold">${formatPrice(b.regular_price)}</span>
+            </div>
+            <div class="flex items-baseline justify-between text-xs font-bold text-indigo-700 pt-2 border-t border-slate-200">
+              <span>Savings:</span>
+              <span>Save ${formatPrice(b.savings)} ({b.discount_pct}% Off)</span>
+            </div>
+          </div>
+        </div>
+
+        <a 
+          href={b.affiliate_url}
+          target="_blank"
+          rel="nofollow noopener"
+          class="w-full bg-[#131921] hover:bg-slate-800 text-white font-heading font-black text-sm py-3.5 px-6 rounded-xl flex items-center justify-center gap-2 transition-all"
+        >
+          <span>View {b.brand} Deal on Amazon</span>
+          <span>→</span>
+        </a>
+      </div>
+
+    </div>
+
+    <!-- Editorial Showdown Verdict -->
+    <div class="p-8 bg-indigo-50/80 border border-indigo-100 rounded-3xl">
+      <div class="flex items-center gap-2 text-xs font-black uppercase tracking-wider text-indigo-900 mb-2">
+        <span>⚡</span>
+        <span>Hardware Radar Verdict</span>
+      </div>
+      <p class="text-sm sm:text-base text-indigo-950 font-medium leading-relaxed">
+        {comp.verdict}
+      </p>
+    </div>
+
+  </div>
+
+</Layout>

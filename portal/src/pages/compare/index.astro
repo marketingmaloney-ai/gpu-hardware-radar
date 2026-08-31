@@ -1,0 +1,91 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import fs from 'fs';
+import path from 'path';
+
+const compPath = path.resolve('../data/comparisons.json');
+let comparisons = [];
+
+if (fs.existsSync(compPath)) {
+  comparisons = JSON.parse(fs.readFileSync(compPath, 'utf-8'));
+}
+
+function formatPrice(val: number) {
+  if (val === undefined || val === null || isNaN(val)) return '0.00';
+  return val % 1 === 0 ? val.toString() : val.toFixed(2);
+}
+---
+
+<Layout title="Hardware Versus Hubs: Head-to-Head GPU & PC Matchups | GPU Hardware Radar">
+  
+  <div class="max-w-[1280px] mx-auto px-4 sm:px-6 py-8">
+    
+    <!-- Hero Banner -->
+    <div class="p-8 sm:p-10 bg-gradient-to-br from-indigo-950 via-slate-900 to-indigo-900 rounded-3xl text-white shadow-2xl relative overflow-hidden mb-12">
+      <div class="absolute -right-20 -top-20 w-80 h-80 bg-indigo-500/20 rounded-full blur-3xl pointer-events-none"></div>
+
+      <div class="relative z-10 max-w-3xl">
+        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-500/20 border border-indigo-400/30 text-indigo-300 text-xs font-bold mb-4">
+          <span>⚔️</span>
+          <span>Head-to-Head Hardware Showdowns</span>
+        </div>
+        <h1 class="font-heading font-black text-3xl sm:text-5xl tracking-tight leading-tight mb-3">
+          Hardware Versus Hubs
+        </h1>
+        <p class="text-sm sm:text-base text-slate-300 leading-relaxed">
+          Compare specs, MSRP benchmarks, live discounts, and enthusiast community ratings side-by-side to make the best upgrade decision.
+        </p>
+      </div>
+    </div>
+
+    <!-- Matchups Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      {comparisons.map((comp: any) => (
+        <a 
+          href={`/compare/${comp.slug}`}
+          class="bg-white border border-slate-200/80 rounded-2xl p-6 shadow-sm hover:border-indigo-400 hover:shadow-xl transition-all duration-300 flex flex-col justify-between group"
+        >
+          <div>
+            <div class="flex items-center justify-between text-xs font-bold text-slate-400 uppercase tracking-wider mb-4">
+              <span>{comp.category_name}</span>
+              <span class="text-indigo-600 font-black">Head-to-Head →</span>
+            </div>
+
+            <!-- Product A vs Product B split -->
+            <div class="grid grid-cols-2 gap-4 items-center bg-slate-50 p-4 rounded-xl border border-slate-100 mb-4">
+              <div class="text-center space-y-2">
+                <div class="h-24 flex items-center justify-center">
+                  <img src={comp.product_a.image_url} alt={comp.product_a.title} class="max-h-full max-w-full object-contain" />
+                </div>
+                <div class="font-bold text-xs text-slate-800 line-clamp-1">{comp.product_a.brand}</div>
+                <div class="font-heading font-black text-sm text-slate-900">${formatPrice(comp.product_a.current_price)}</div>
+              </div>
+
+              <div class="text-center space-y-2 border-l border-slate-200 pl-4">
+                <div class="h-24 flex items-center justify-center">
+                  <img src={comp.product_b.image_url} alt={comp.product_b.title} class="max-h-full max-w-full object-contain" />
+                </div>
+                <div class="font-bold text-xs text-slate-800 line-clamp-1">{comp.product_b.brand}</div>
+                <div class="font-heading font-black text-sm text-slate-900">${formatPrice(comp.product_b.current_price)}</div>
+              </div>
+            </div>
+
+            <h3 class="font-heading font-black text-base text-slate-900 group-hover:text-indigo-600 transition-colors leading-snug">
+              {comp.title}
+            </h3>
+            <p class="text-xs text-slate-500 line-clamp-2 mt-2 leading-relaxed">
+              {comp.verdict}
+            </p>
+          </div>
+
+          <div class="pt-4 border-t border-slate-100 flex items-center justify-between text-xs font-bold text-indigo-600">
+            <span>Read Showdown & Price Analysis</span>
+            <span class="group-hover:translate-x-1 transition-transform">→</span>
+          </div>
+        </a>
+      ))}
+    </div>
+
+  </div>
+
+</Layout>

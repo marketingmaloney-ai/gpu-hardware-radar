@@ -1,0 +1,58 @@
+{
+  "site_name": "GPU Hardware Radar",
+  "site_slug": "gpu-hardware-radar",
+  "domain": "gpu-hardware-radar.pages.dev",
+  "primary_tagline": "Track Verified 90-Day Price Drops on GPUs, CPUs & High-Performance PC Components",
+  "tag": "priceradar04-20",
+  "brand_color": "indigo",
+  "brand_color_hex": "#6366f1",
+  "categories": [
+    {
+      "id": "nvidia-rtx-gpus",
+      "name": "NVIDIA GeForce RTX GPUs",
+      "short_name": "NVIDIA GPUs",
+      "slug": "nvidia-rtx-gpus",
+      "description": "GeForce RTX 4090, 4080 Super, 4070 Ti Super, 4070, and 4060 Ti graphics cards."
+    },
+    {
+      "id": "amd-radeon-gpus",
+      "name": "AMD Radeon RX GPUs",
+      "short_name": "AMD GPUs",
+      "slug": "amd-radeon-gpus",
+      "description": "Radeon RX 7900 XTX, 7900 XT, 7800 XT, 7700 XT, and 7600 graphics cards."
+    },
+    {
+      "id": "cpus-processors",
+      "name": "Desktop Processors & CPUs",
+      "short_name": "CPUs",
+      "slug": "cpus-processors",
+      "description": "AMD Ryzen 9/7/5 X3D and Intel Core i9/i7/i5 high-performance desktop processors."
+    },
+    {
+      "id": "motherboards-ram",
+      "name": "Motherboards & DDR5 RAM",
+      "short_name": "Motherboards & RAM",
+      "slug": "motherboards-ram",
+      "description": "PCIe 5.0 gaming motherboards (X670E, B650, Z790) and high-frequency DDR5 memory kits."
+    },
+    {
+      "id": "psus-cases",
+      "name": "Power Supplies & PC Cases",
+      "short_name": "PSUs & Cases",
+      "slug": "psus-cases",
+      "description": "ATX 3.0 Gold/Platinum power supplies and high-airflow panoramic gaming PC cases."
+    },
+    {
+      "id": "cooling-nvme-ssds",
+      "name": "AIO Liquid Cooling & Fast SSDs",
+      "short_name": "Cooling & SSDs",
+      "slug": "cooling-nvme-ssds",
+      "description": "360mm AIO RGB liquid coolers and Gen4/Gen5 2TB-4TB high-speed NVMe M.2 solid state drives."
+    }
+  ],
+  "network_sites": [
+    { "name": "PriceDropRadar.com", "url": "https://price-drop-radar.com", "icon": "⚡" },
+    { "name": "SportsGearRadar", "url": "https://sports-gear-radar.pages.dev", "icon": "🏆" },
+    { "name": "GolfGearRadar", "url": "https://golf-gear-radar.pages.dev", "icon": "⛳" }
+  ]
+}

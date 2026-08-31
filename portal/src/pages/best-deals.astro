@@ -1,0 +1,161 @@
+---
+import Layout from '../layouts/Layout.astro';
+import fs from 'fs';
+import path from 'path';
+
+const bestDealsPath = path.resolve('../data/clark_best_deals.json');
+let bestDeals = [];
+
+if (fs.existsSync(bestDealsPath)) {
+  bestDeals = JSON.parse(fs.readFileSync(bestDealsPath, 'utf-8'));
+}
+
+// Group curated staff picks by category
+const dealsByCategory = bestDeals.reduce((acc: any, deal: any) => {
+  const cat = deal.category_name || deal.category;
+  if (!acc[cat]) acc[cat] = [];
+  acc[cat].push(deal);
+  return acc;
+}, {});
+
+function formatPrice(val: number) {
+  if (val === undefined || val === null || isNaN(val)) return '0.00';
+  return val % 1 === 0 ? val.toString() : val.toFixed(2);
+}
+---
+
+<Layout title="Curated Staff Picks: Best Hardware Deals | GPU Hardware Radar">
+  
+  <div class="max-w-[1280px] mx-auto px-4 sm:px-6 py-8">
+    
+    <!-- Hero / Editorial Banner -->
+    <div class="p-8 sm:p-10 bg-gradient-to-br from-indigo-950 via-slate-900 to-indigo-900 rounded-3xl text-white shadow-2xl relative overflow-hidden mb-12">
+      <div class="absolute -right-20 -top-20 w-80 h-80 bg-indigo-500/20 rounded-full blur-3xl pointer-events-none"></div>
+
+      <div class="relative z-10 max-w-3xl">
+        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-500/20 border border-indigo-400/30 text-indigo-300 text-xs font-bold mb-4">
+          <span>⚡</span>
+          <span>Curated Department Winners: Top 1–2 Per Category</span>
+        </div>
+        <h1 class="font-heading font-black text-3xl sm:text-5xl tracking-tight leading-tight mb-3">
+          Staff Picks: The Best Hardware Deals
+        </h1>
+        <p class="text-sm sm:text-base text-slate-300 leading-relaxed mb-6">
+          Every day our radar evaluates hundreds of PC components, filtering out filler to highlight strictly the <strong>#1 best discount per hardware department</strong> based on markdown depth, radar value score, and enthusiast community ratings.
+        </p>
+
+        <!-- Stats Bar -->
+        <div class="flex flex-wrap gap-4 text-xs font-bold">
+          <div class="bg-slate-800/80 px-3.5 py-2 rounded-xl border border-slate-700">
+            <span class="text-slate-400 block text-[10px] uppercase">Curated Catalog</span>
+            <span class="text-white text-sm font-black">{bestDeals.length} Elite Deals</span>
+          </div>
+          <div class="bg-slate-800/80 px-3.5 py-2 rounded-xl border border-slate-700">
+            <span class="text-indigo-400 block text-[10px] uppercase">Average Savings</span>
+            <span class="text-white text-sm font-black">$120.00+</span>
+          </div>
+          <div class="bg-slate-800/80 px-3.5 py-2 rounded-xl border border-slate-700">
+            <span class="text-amber-400 block text-[10px] uppercase">Curation Rule</span>
+            <span class="text-white text-sm font-black">Top 1–2 / Department</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Category Grouped Showcase -->
+    <div class="space-y-12">
+      {Object.entries(dealsByCategory).map(([categoryName, items]: [string, any]) => (
+        <section class="space-y-6">
+          <div class="flex items-center justify-between pb-3 border-b border-slate-200">
+            <div>
+              <span class="text-xs font-bold uppercase tracking-wider text-indigo-600 block">Department Spotlight</span>
+              <h2 class="font-heading font-black text-2xl text-slate-900">{categoryName}</h2>
+            </div>
+            <span class="text-xs font-bold text-slate-500 bg-slate-100 px-2.5 py-1 rounded-full">
+              {items.length} Curated Pick{items.length > 1 ? 's' : ''}
+            </span>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {items.map((deal: any) => (
+              <div class="bg-white border border-slate-200/80 rounded-2xl p-6 shadow-sm hover:border-indigo-400 hover:shadow-xl transition-all duration-300 flex flex-col justify-between relative group">
+                
+                <!-- Rank Ribbon Badge -->
+                <div class="flex items-center justify-between gap-2 mb-4">
+                  {deal.staff_pick_rank === 1 ? (
+                    <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-gradient-to-r from-amber-500 to-amber-600 text-white text-xs font-black shadow-xs">
+                      <span>★</span>
+                      <span>#1 Choice in {categoryName}</span>
+                    </span>
+                  ) : (
+                    <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-indigo-50 text-indigo-800 text-xs font-bold border border-indigo-200">
+                      <span>Runner-Up Spotlight</span>
+                    </span>
+                  )}
+                  <span class="text-xs font-black bg-[#131921] text-indigo-400 px-2 py-0.5 rounded">
+                    {deal.radar_score}/100 Score
+                  </span>
+                </div>
+
+                <!-- Product Content -->
+                <div class="flex flex-col sm:flex-row gap-6 mb-6">
+                  <div class="w-full sm:w-44 aspect-square bg-slate-50 rounded-xl p-4 flex items-center justify-center flex-shrink-0 border border-slate-100">
+                    <img src={deal.image_url} alt={deal.title} class="max-h-full max-w-full object-contain group-hover:scale-105 transition-transform" />
+                  </div>
+
+                  <div class="flex-1 space-y-2">
+                    <div class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">
+                      @{deal.brand.toLowerCase()} • {deal.rating}★ ({deal.review_count.toLocaleString()} reviews)
+                    </div>
+                    <h3 class="font-heading font-black text-base text-slate-900 leading-snug group-hover:text-indigo-600 transition-colors">
+                      {deal.title}
+                    </h3>
+                    
+                    <!-- Editorial Verdict Note -->
+                    <div class="p-3 bg-indigo-50/70 border border-indigo-100 rounded-xl text-xs text-indigo-950 leading-relaxed font-medium">
+                      {deal.clark_note}
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Pricing & CTA Row -->
+                <div class="pt-4 border-t border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                  <div>
+                    <div class="flex items-baseline gap-2">
+                      <span class="font-heading font-black text-2xl text-slate-900">
+                        ${formatPrice(deal.current_price)}
+                      </span>
+                      {deal.savings > 0 && (
+                        <span class="text-xs text-slate-400 line-through font-bold">
+                          ${formatPrice(deal.regular_price)}
+                        </span>
+                      )}
+                    </div>
+                    {deal.savings > 0 && (
+                      <div class="text-xs font-bold text-indigo-700">
+                        Save ${formatPrice(deal.savings)} ({deal.discount_pct}% Off)
+                      </div>
+                    )}
+                  </div>
+
+                  <a 
+                    href={deal.affiliate_url} 
+                    target="_blank" 
+                    rel="nofollow noopener"
+                    class="bg-[#131921] hover:bg-slate-800 text-white font-heading font-black text-xs px-6 py-3 rounded-xl flex items-center justify-center gap-2 transition-all shadow-md group"
+                  >
+                    <span>View Deal on Amazon</span>
+                    <span class="group-hover:translate-x-1 transition-transform">→</span>
+                  </a>
+                </div>
+
+              </div>
+            ))}
+          </div>
+        </section>
+      ))}
+    </div>
+
+  </div>
+
+</Layout>

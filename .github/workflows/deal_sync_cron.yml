@@ -1,0 +1,56 @@
+name: 24/7 Automated Deal Sync & Cloudflare Deployment
+
+on:
+  schedule:
+    - cron: '0 */3 * * *' # Run every 3 hours
+  workflow_dispatch:
+
+jobs:
+  sync-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install Root Dependencies
+        run: |
+          npm install puppeteer --no-save
+
+      - name: Harvest Fresh Hardware Deals
+        run: |
+          node backend/pipeline/dynamic_deal_harvester.js
+
+      - name: Generate Hardware Showdowns
+        run: |
+          node backend/pipeline/relink_showdowns.js
+
+      - name: Run 14-Point Zero-Defect Audit Gate
+        run: |
+          node backend/pipeline/audit_versus_hub.js
+
+      - name: Build Portal
+        working-directory: ./portal
+        run: |
+          npm install
+          npm run build
+
+      - name: Deploy to Cloudflare Pages
+        uses: cloudflare/pages-action@v1
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          projectName: gpu-hardware-radar
+          directory: portal/dist
+          gitHubToken: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Commit Updated Catalog
+        run: |
+          git config --global user.name "GitHub Action Radar Daemon"
+          git config --global user.email "bot@gpu-hardware-radar.pages.dev"
+          git add data/
+          git diff --quiet && git diff --staged --quiet || (git commit -m "chore(cron): sync 90-day hardware price drops" && git push origin main)

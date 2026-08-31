@@ -1,0 +1,52 @@
+---
+import Layout from '../layouts/Layout.astro';
+import DealCard from '../components/DealCard.astro';
+import QuickViewDrawer from '../components/QuickViewDrawer.astro';
+import fs from 'fs';
+import path from 'path';
+
+const dealsPath = path.resolve('../data/deals.json');
+let deals = [];
+
+if (fs.existsSync(dealsPath)) {
+  deals = JSON.parse(fs.readFileSync(dealsPath, 'utf-8'));
+}
+
+const lightningDeals = deals.filter((d: any) => d.is_lightning_deal || d.discount_pct >= 20);
+---
+
+<Layout title="Amazon Lightning Deals on GPUs & PC Hardware | GPU Hardware Radar">
+  
+  <div class="max-w-[1440px] mx-auto px-4 sm:px-6 py-8">
+    
+    <div class="p-8 bg-gradient-to-r from-amber-500 via-amber-600 to-orange-600 rounded-3xl text-white shadow-xl mb-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
+      <div>
+        <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/20 text-white text-xs font-bold mb-3">
+          <span>⚡</span>
+          <span>Limited Time Discounts (20%+ Off MSRP)</span>
+        </div>
+        <h1 class="font-heading font-black text-3xl sm:text-4xl tracking-tight leading-tight">
+          Active Lightning Deals & Flash Price Drops
+        </h1>
+        <p class="text-xs sm:text-sm text-amber-100 mt-2 max-w-xl">
+          Real-time hardware markdowns with urgent savings. Prices fluctuate rapidly based on Amazon inventory.
+        </p>
+      </div>
+
+      <div class="bg-black/20 p-4 rounded-2xl border border-white/20 text-center flex-shrink-0">
+        <span class="text-[10px] uppercase font-bold text-amber-200 block">Flash Drops Found</span>
+        <span class="font-heading font-black text-3xl text-white">{lightningDeals.length} Deals</span>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-5 gap-4">
+      {lightningDeals.map((deal: any) => (
+        <DealCard deal={deal} />
+      ))}
+    </div>
+
+  </div>
+
+  <QuickViewDrawer />
+
+</Layout>
