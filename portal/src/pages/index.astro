@@ -75,8 +75,8 @@ const brands = [...new Set(deals.map((d: any) => d.brand))].slice(0, 10);
     <!-- 2-Column App-Style Layout: Left Sidebar + Right 5-Column Portrait Grid -->
     <div class="flex flex-col lg:flex-row gap-8 items-start">
       
-      <!-- ── LEFT SIDEBAR FILTERS (Sticky) ── -->
-      <aside class="w-full lg:w-64 flex-shrink-0 lg:sticky lg:top-20 space-y-6">
+      <!-- ── LEFT SIDEBAR FILTERS (Sticky Desktop) ── -->
+      <aside class="hidden lg:block w-64 flex-shrink-0 lg:sticky lg:top-20 space-y-6">
         
         <!-- Feed Navigation -->
         <div class="text-[10px] font-black uppercase tracking-wider text-slate-400 px-3">
@@ -86,7 +86,7 @@ const brands = [...new Set(deals.map((d: any) => d.brand))].slice(0, 10);
         <nav class="space-y-1 text-xs font-semibold text-slate-600">
           <button 
             id="filter-all-btn"
-            class="w-full flex items-center justify-between px-3 py-2 rounded-xl bg-indigo-50 text-indigo-800 font-bold transition-colors text-left"
+            class="feed-filter-btn active w-full flex items-center justify-between px-3 py-2 rounded-xl bg-indigo-50 text-indigo-800 font-bold transition-colors text-left"
           >
             <span>All Hardware Deals</span>
             <span class="w-2 h-2 rounded-full bg-indigo-500"></span>
@@ -94,7 +94,7 @@ const brands = [...new Set(deals.map((d: any) => d.brand))].slice(0, 10);
 
           <button 
             id="filter-deep-btn"
-            class="w-full flex items-center justify-between px-3 py-2 rounded-xl hover:bg-slate-100 text-slate-700 transition-colors text-left"
+            class="feed-filter-btn w-full flex items-center justify-between px-3 py-2 rounded-xl hover:bg-slate-100 text-slate-700 transition-colors text-left"
           >
             <span>Deepest Drops (20%+ Off)</span>
             <span class="text-[10px] font-bold text-indigo-600">🔥</span>
@@ -136,16 +136,15 @@ const brands = [...new Set(deals.map((d: any) => d.brand))].slice(0, 10);
           {categories.map((cat) => (
             <button 
               data-category-id={cat.id}
-              class="category-filter-btn w-full flex items-center justify-between px-3 py-2 rounded-xl hover:bg-slate-100 text-slate-700 transition-colors text-left"
+              class="category-filter-btn w-full flex items-center justify-between px-3 py-2 rounded-xl hover:bg-slate-100 text-slate-700 transition-colors text-left font-semibold"
             >
               <span>{cat.name}</span>
-              <span class="text-[10px] text-slate-400 font-bold bg-slate-100 px-1.5 py-0.2 rounded">{cat.count}</span>
             </button>
           ))}
         </nav>
 
-        <!-- Versus Hubs Quick Link -->
-        <div class="p-4 bg-slate-50 border border-slate-200/80 rounded-2xl space-y-2">
+        <!-- Versus Hubs Card -->
+        <div class="p-3.5 bg-slate-50 border border-slate-200/80 rounded-2xl space-y-2">
           <div class="flex items-center justify-between">
             <span class="text-xs font-bold text-slate-900">Versus Hubs</span>
             <span class="text-[9px] bg-indigo-100 text-indigo-800 font-black px-1.5 py-0.5 rounded">{comparisons.length} Matchups</span>
@@ -179,15 +178,39 @@ const brands = [...new Set(deals.map((d: any) => d.brand))].slice(0, 10);
       </aside>
 
       <!-- ── RIGHT MAIN FEED (5-Column Grid) ── -->
-      <section class="flex-1 w-full">
+      <section class="flex-1 w-full min-w-0">
         
+        <!-- Mobile Horizontal Category Chips Rail (Screens < lg) -->
+        <div class="lg:hidden mb-4 -mx-4 px-4 overflow-x-auto no-scrollbar scroll-smooth flex items-center gap-1.5 border-b border-slate-100 pb-3">
+          <button 
+            data-category-id="all"
+            class="mobile-cat-chip active flex-shrink-0 px-3 py-1.5 rounded-full text-xs font-bold bg-indigo-50 text-indigo-800 border border-indigo-200"
+          >
+            🔥 All Deals
+          </button>
+          <button 
+            data-category-id="deep-drops"
+            class="mobile-cat-chip flex-shrink-0 px-3 py-1.5 rounded-full text-xs font-bold bg-slate-100 text-slate-700 hover:bg-indigo-50 hover:text-indigo-800"
+          >
+            ⚡ Deep Drops (20%+)
+          </button>
+          {categories.map((cat) => (
+            <button 
+              data-category-id={cat.id}
+              class="mobile-cat-chip flex-shrink-0 px-3 py-1.5 rounded-full text-xs font-bold bg-slate-100 text-slate-700 hover:bg-indigo-50 hover:text-indigo-800 transition-colors"
+            >
+              {cat.name}
+            </button>
+          ))}
+        </div>
+
         <!-- Controls / Search / Sort -->
         <div class="flex flex-col sm:flex-row items-center justify-between gap-4 mb-6 pb-4 border-b border-slate-100">
           <div class="text-xs font-bold text-slate-500">
             Showing <span id="visible-deal-count" class="text-slate-900 font-black">{deals.length}</span> verified deals
           </div>
 
-          <div class="flex items-center gap-3 w-full sm:w-auto">
+          <div class="flex items-center gap-3 w-full sm:w-auto justify-between sm:justify-end">
             <label class="text-xs font-bold text-slate-500">Sort By:</label>
             <select 
               id="sort-select"
@@ -241,12 +264,43 @@ const brands = [...new Set(deals.map((d: any) => d.brand))].slice(0, 10);
     const allBtn = document.getElementById('filter-all-btn');
     const deepBtn = document.getElementById('filter-deep-btn');
     const catBtns = document.querySelectorAll('.category-filter-btn');
+    const mobileChips = document.querySelectorAll('.mobile-cat-chip');
     const brandBtns = document.querySelectorAll('.brand-filter-btn');
     const resetBtn = document.getElementById('reset-filter-btn');
 
     let activeCategory = null;
     let activeBrand = null;
     let deepDiscountOnly = false;
+
+    function updatePillStyles() {
+      // Mobile chips style
+      mobileChips.forEach(chip => {
+        const cid = chip.dataset.categoryId;
+        if (
+          (cid === 'all' && !activeCategory && !deepDiscountOnly) ||
+          (cid === 'deep-drops' && deepDiscountOnly) ||
+          (cid === activeCategory && !deepDiscountOnly)
+        ) {
+          chip.classList.remove('bg-slate-100', 'text-slate-700');
+          chip.classList.add('bg-indigo-50', 'text-indigo-800', 'border-indigo-200');
+        } else {
+          chip.classList.remove('bg-indigo-50', 'text-indigo-800', 'border-indigo-200');
+          chip.classList.add('bg-slate-100', 'text-slate-700');
+        }
+      });
+
+      // Desktop category buttons style
+      catBtns.forEach(btn => {
+        const cid = btn.dataset.categoryId;
+        if (cid === activeCategory) {
+          btn.classList.remove('text-slate-700', 'bg-slate-100');
+          btn.classList.add('bg-indigo-50', 'text-indigo-800', 'font-bold');
+        } else {
+          btn.classList.remove('bg-indigo-50', 'text-indigo-800', 'font-bold');
+          btn.classList.add('text-slate-700');
+        }
+      });
+    }
 
     function renderFilter() {
       let visible = 0;
@@ -279,6 +333,8 @@ const brands = [...new Set(deals.map((d: any) => d.brand))].slice(0, 10);
           grid.classList.remove('hidden');
         }
       }
+
+      updatePillStyles();
     }
 
     allBtn?.addEventListener('click', () => {
@@ -290,6 +346,7 @@ const brands = [...new Set(deals.map((d: any) => d.brand))].slice(0, 10);
 
     deepBtn?.addEventListener('click', () => {
       deepDiscountOnly = !deepDiscountOnly;
+      activeCategory = null;
       renderFilter();
     });
 
@@ -297,6 +354,25 @@ const brands = [...new Set(deals.map((d: any) => d.brand))].slice(0, 10);
       btn.addEventListener('click', () => {
         const cid = btn.dataset.categoryId;
         activeCategory = (activeCategory === cid) ? null : cid;
+        deepDiscountOnly = false;
+        renderFilter();
+      });
+    });
+
+    mobileChips.forEach(chip => {
+      chip.addEventListener('click', () => {
+        const cid = chip.dataset.categoryId;
+        if (cid === 'all') {
+          activeCategory = null;
+          deepDiscountOnly = false;
+        } else if (cid === 'deep-drops') {
+          deepDiscountOnly = !deepDiscountOnly;
+          activeCategory = null;
+        } else {
+          activeCategory = (activeCategory === cid) ? null : cid;
+          deepDiscountOnly = false;
+        }
+        activeBrand = null;
         renderFilter();
       });
     });
@@ -341,4 +417,5 @@ const brands = [...new Set(deals.map((d: any) => d.brand))].slice(0, 10);
   }
 
   document.addEventListener('DOMContentLoaded', initFeedFiltering);
+  initFeedFiltering();
 </script>
