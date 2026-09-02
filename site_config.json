@@ -51,6 +51,7 @@
     }
   ],
   "network_sites": [
+    { "name": "BlackFriday365.deals", "url": "https://blackfriday365.deals", "icon": "⚡" },
     { "name": "PriceDropRadar.com", "url": "https://price-drop-radar.com", "icon": "⚡" },
     { "name": "SportsGearRadar", "url": "https://sports-gear-radar.pages.dev", "icon": "🏆" },
     { "name": "GolfGearRadar", "url": "https://golf-gear-radar.pages.dev", "icon": "⛳" }
