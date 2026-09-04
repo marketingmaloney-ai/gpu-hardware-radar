@@ -35,21 +35,11 @@ jobs:
         run: |
           node backend/pipeline/audit_versus_hub.js
 
-      - name: Build Portal
+      - name: Validate Portal Build
         working-directory: ./portal
         run: |
           npm install
           npm run build
-
-      - name: Deploy to Cloudflare Pages (Direct API)
-        if: ${{ secrets.CLOUDFLARE_API_TOKEN != '' }}
-        uses: cloudflare/pages-action@v1
-        with:
-          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          projectName: gpu-hardware-radar
-          directory: portal/dist
-          gitHubToken: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Commit and Push Updated Catalog
         run: |
