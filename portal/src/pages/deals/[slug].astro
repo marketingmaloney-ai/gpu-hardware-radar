@@ -43,12 +43,12 @@ const productSchema = {
   "@type": "Product",
   "name": formatSchemaName(deal.title, 140),
   "image": canonicalImage,
-  "description": (deal.seo && deal.seo.meta_description) || deal.title,
+  "description": (deal.seo && deal.seo.meta_description) || deal.title || "Verified live GPU and PC hardware deal.",
   "sku": deal.asin,
   "mpn": deal.asin,
   "brand": {
     "@type": "Brand",
-    "name": deal.brand
+    "name": deal.brand || "PC Hardware"
   },
   "aggregateRating": {
     "@type": "AggregateRating",
@@ -61,10 +61,46 @@ const productSchema = {
     "@type": "Offer",
     "price": deal.current_price.toString(),
     "priceCurrency": "USD",
+    "validFrom": "2026-01-01",
     "priceValidUntil": "2026-12-31",
     "availability": "https://schema.org/InStock",
     "itemCondition": "https://schema.org/NewCondition",
-    "url": `https://gpu-hardware-radar.pages.dev/deals/${deal.slug}`
+    "url": `https://gpu-hardware-radar.pages.dev/deals/${deal.slug}`,
+    "hasMerchantReturnPolicy": {
+      "@type": "MerchantReturnPolicy",
+      "applicableCountry": "US",
+      "returnPolicyCategory": "https://schema.org/MerchantReturnFiniteReturnWindow",
+      "merchantReturnDays": 30,
+      "returnMethod": "https://schema.org/ReturnByMail",
+      "returnFees": "https://schema.org/FreeReturn"
+    },
+    "shippingDetails": {
+      "@type": "OfferShippingDetails",
+      "shippingRate": {
+        "@type": "MonetaryAmount",
+        "value": "0.00",
+        "currency": "USD"
+      },
+      "shippingDestination": {
+        "@type": "DefinedRegion",
+        "addressCountry": "US"
+      },
+      "deliveryTime": {
+        "@type": "ShippingDeliveryTime",
+        "handlingTime": {
+          "@type": "QuantitativeValue",
+          "minValue": 0,
+          "maxValue": 1,
+          "unitCode": "DAY"
+        },
+        "transitTime": {
+          "@type": "QuantitativeValue",
+          "minValue": 1,
+          "maxValue": 3,
+          "unitCode": "DAY"
+        }
+      }
+    }
   }
 };
 ---

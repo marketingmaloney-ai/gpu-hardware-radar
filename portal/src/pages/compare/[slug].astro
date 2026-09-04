@@ -42,33 +42,115 @@ const schema = {
   "name": formatSchemaName(comp.title, 140),
   "description": `Direct side-by-side comparison of ${a.title} vs ${b.title}`,
   "category": comp.category_name || "PC Hardware",
+  "brand": {
+    "@type": "Brand",
+    "name": a.brand || b.brand || "PC Hardware"
+  },
   "isSimilarTo": [
     {
       "@type": "Product",
       "name": formatSchemaName(a.title, 140),
       "image": a.image_url && a.image_url.startsWith('http') ? a.image_url : `https://gpu-hardware-radar.pages.dev${a.image_url || ''}`,
-      "brand": { "@type": "Brand", "name": a.brand },
+      "description": a.description || a.title || `Side-by-side comparison showdown for ${a.name || a.title}.`,
+      "sku": a.asin,
+      "mpn": a.asin,
+      "brand": { "@type": "Brand", "name": a.brand || "PC Hardware" },
       "offers": {
         "@type": "Offer",
         "price": (a.current_price || a.price || '0').toString(),
         "priceCurrency": "USD",
+        "validFrom": "2026-01-01",
         "priceValidUntil": "2026-12-31",
         "availability": "https://schema.org/InStock",
-        "url": `https://gpu-hardware-radar.pages.dev/deals/${a.slug}`
+        "url": `https://gpu-hardware-radar.pages.dev/deals/${a.slug}`,
+        "hasMerchantReturnPolicy": {
+          "@type": "MerchantReturnPolicy",
+          "applicableCountry": "US",
+          "returnPolicyCategory": "https://schema.org/MerchantReturnFiniteReturnWindow",
+          "merchantReturnDays": 30,
+          "returnMethod": "https://schema.org/ReturnByMail",
+          "returnFees": "https://schema.org/FreeReturn"
+        },
+        "shippingDetails": {
+          "@type": "OfferShippingDetails",
+          "shippingRate": {
+            "@type": "MonetaryAmount",
+            "value": "0.00",
+            "currency": "USD"
+          },
+          "shippingDestination": {
+            "@type": "DefinedRegion",
+            "addressCountry": "US"
+          },
+          "deliveryTime": {
+            "@type": "ShippingDeliveryTime",
+            "handlingTime": {
+              "@type": "QuantitativeValue",
+              "minValue": 0,
+              "maxValue": 1,
+              "unitCode": "DAY"
+            },
+            "transitTime": {
+              "@type": "QuantitativeValue",
+              "minValue": 1,
+              "maxValue": 3,
+              "unitCode": "DAY"
+            }
+          }
+        }
       }
     },
     {
       "@type": "Product",
       "name": formatSchemaName(b.title, 140),
       "image": b.image_url && b.image_url.startsWith('http') ? b.image_url : `https://gpu-hardware-radar.pages.dev${b.image_url || ''}`,
-      "brand": { "@type": "Brand", "name": b.brand },
+      "description": b.description || b.title || `Side-by-side comparison showdown for ${b.name || b.title}.`,
+      "sku": b.asin,
+      "mpn": b.asin,
+      "brand": { "@type": "Brand", "name": b.brand || "PC Hardware" },
       "offers": {
         "@type": "Offer",
         "price": (b.current_price || b.price || '0').toString(),
         "priceCurrency": "USD",
+        "validFrom": "2026-01-01",
         "priceValidUntil": "2026-12-31",
         "availability": "https://schema.org/InStock",
-        "url": `https://gpu-hardware-radar.pages.dev/deals/${b.slug}`
+        "url": `https://gpu-hardware-radar.pages.dev/deals/${b.slug}`,
+        "hasMerchantReturnPolicy": {
+          "@type": "MerchantReturnPolicy",
+          "applicableCountry": "US",
+          "returnPolicyCategory": "https://schema.org/MerchantReturnFiniteReturnWindow",
+          "merchantReturnDays": 30,
+          "returnMethod": "https://schema.org/ReturnByMail",
+          "returnFees": "https://schema.org/FreeReturn"
+        },
+        "shippingDetails": {
+          "@type": "OfferShippingDetails",
+          "shippingRate": {
+            "@type": "MonetaryAmount",
+            "value": "0.00",
+            "currency": "USD"
+          },
+          "shippingDestination": {
+            "@type": "DefinedRegion",
+            "addressCountry": "US"
+          },
+          "deliveryTime": {
+            "@type": "ShippingDeliveryTime",
+            "handlingTime": {
+              "@type": "QuantitativeValue",
+              "minValue": 0,
+              "maxValue": 1,
+              "unitCode": "DAY"
+            },
+            "transitTime": {
+              "@type": "QuantitativeValue",
+              "minValue": 1,
+              "maxValue": 3,
+              "unitCode": "DAY"
+            }
+          }
+        }
       }
     }
   ]

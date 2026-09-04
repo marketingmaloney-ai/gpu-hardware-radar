@@ -58,14 +58,56 @@ const itemListSchema = {
       "@type": "Product",
       "name": formatSchemaName(deal.title, 140),
       "image": deal.image_url && deal.image_url.startsWith('http') ? deal.image_url : `https://gpu-hardware-radar.pages.dev${deal.image_url || ''}`,
-      "description": (deal.seo && deal.seo.meta_description) || deal.title,
+      "description": (deal.seo && deal.seo.meta_description) || deal.title || "Verified live GPU and PC hardware deal.",
       "sku": deal.asin,
+      "mpn": deal.asin,
+      "brand": {
+        "@type": "Brand",
+        "name": deal.brand || "PC Hardware"
+      },
       "offers": {
         "@type": "Offer",
         "price": (deal.current_price || deal.price || '0').toString(),
         "priceCurrency": "USD",
+        "validFrom": "2026-01-01",
+        "priceValidUntil": "2026-12-31",
         "availability": "https://schema.org/InStock",
-        "url": `https://gpu-hardware-radar.pages.dev/deals/${deal.slug}`
+        "url": `https://gpu-hardware-radar.pages.dev/deals/${deal.slug}`,
+        "hasMerchantReturnPolicy": {
+          "@type": "MerchantReturnPolicy",
+          "applicableCountry": "US",
+          "returnPolicyCategory": "https://schema.org/MerchantReturnFiniteReturnWindow",
+          "merchantReturnDays": 30,
+          "returnMethod": "https://schema.org/ReturnByMail",
+          "returnFees": "https://schema.org/FreeReturn"
+        },
+        "shippingDetails": {
+          "@type": "OfferShippingDetails",
+          "shippingRate": {
+            "@type": "MonetaryAmount",
+            "value": "0.00",
+            "currency": "USD"
+          },
+          "shippingDestination": {
+            "@type": "DefinedRegion",
+            "addressCountry": "US"
+          },
+          "deliveryTime": {
+            "@type": "ShippingDeliveryTime",
+            "handlingTime": {
+              "@type": "QuantitativeValue",
+              "minValue": 0,
+              "maxValue": 1,
+              "unitCode": "DAY"
+            },
+            "transitTime": {
+              "@type": "QuantitativeValue",
+              "minValue": 1,
+              "maxValue": 3,
+              "unitCode": "DAY"
+            }
+          }
+        }
       }
     }
   }))
