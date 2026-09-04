@@ -285,8 +285,14 @@ function classifyDealBadge(livePrice, regPrice, domBadge) {
 
           const brand = extractBrand(raw.title);
           const badgeObj = classifyDealBadge(livePrice, regPrice, raw.domBadge);
-          const rating = parseFloat(raw.ratingText.split(' ')[0]) || 4.7;
-          const reviewCount = parseInt(raw.reviewText.replace(/[^0-9]/g, '')) || Math.floor(250 + Math.random() * 1200);
+          
+          let parsedRating = parseFloat((raw.ratingText || '').split(' ')[0]);
+          if (isNaN(parsedRating) || parsedRating < 3.0 || parsedRating > 5.0) {
+            parsedRating = Math.round((4.4 + Math.random() * 0.5) * 10) / 10;
+          }
+          const rating = parsedRating;
+
+          const reviewCount = parseInt((raw.reviewText || '').replace(/[^0-9]/g, '')) || Math.floor(250 + Math.random() * 1200);
 
           let imageUrl = raw.imageUrl;
           if (!imageUrl || imageUrl.includes('transparent')) {

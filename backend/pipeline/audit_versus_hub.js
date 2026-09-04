@@ -70,7 +70,7 @@ const duplicateSlugs = slugs.filter((s, i) => slugs.indexOf(s) !== i);
 check('Slug Uniqueness (100% unique slugs)', duplicateSlugs.length === 0, `Found duplicates: ${duplicateSlugs.join(', ')}`);
 
 // 12. Rating Integrity
-const invalidRatings = deals.filter(d => d.rating < 3.0 || d.rating > 5.0);
+const invalidRatings = deals.filter(d => !d.rating || isNaN(d.rating) || d.rating < 3.0 || d.rating > 5.0);
 check('Rating Range Integrity (3.0 - 5.0)', invalidRatings.length === 0, `Found ${invalidRatings.length}`);
 
 // 13. High-Res Image Protocol
