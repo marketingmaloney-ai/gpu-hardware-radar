@@ -8,6 +8,8 @@ on:
 jobs:
   sync-and-deploy:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
@@ -39,7 +41,8 @@ jobs:
           npm install
           npm run build
 
-      - name: Deploy to Cloudflare Pages
+      - name: Deploy to Cloudflare Pages (Direct API)
+        if: ${{ secrets.CLOUDFLARE_API_TOKEN != '' }}
         uses: cloudflare/pages-action@v1
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
@@ -48,9 +51,14 @@ jobs:
           directory: portal/dist
           gitHubToken: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Commit Updated Catalog
+      - name: Commit and Push Updated Catalog
         run: |
           git config --global user.name "GitHub Action Radar Daemon"
           git config --global user.email "bot@gpu-hardware-radar.pages.dev"
           git add data/
-          git diff --quiet && git diff --staged --quiet || (git commit -m "chore(cron): sync 90-day hardware price drops" && git push origin main)
+          if ! git diff --quiet data/ || ! git diff --staged --quiet data/; then
+            git commit -m "chore(cron): sync 90-day hardware price drops [skip ci]"
+            git push origin main
+          else
+            echo "No catalog changes to commit."
+          fi
