@@ -311,7 +311,7 @@ const itemListSchema = {
           {deals.map((deal: any, index: number) => (
             <>
               <DealCard deal={deal} />
-              {(index === 5 || (index > 5 && (index - 5) % 18 === 0)) && (
+              {index === 5 && (
                 <div class="promo-card relative bg-gradient-to-br from-slate-950 via-slate-900 to-rose-950 rounded-2xl overflow-hidden border-2 border-rose-500/40 shadow-sm flex flex-col justify-between p-4 group hover:border-rose-400 transition-all text-white">
                   <div>
                     <div class="flex items-center justify-between gap-2 mb-3">
@@ -327,10 +327,10 @@ const itemListSchema = {
                         BlackFriday365.deals
                       </div>
                       <h3 class="font-heading font-black text-base text-white leading-snug">
-                        Looking for Deeper Liquidation Steals?
+                        Unadvertised Retailer Clearance
                       </h3>
                       <p class="text-[11px] text-slate-300 leading-relaxed">
-                        Browse Amazon warehouse overstock, PC hardware clearance, and extreme doorbuster discounts updated 24/7.
+                        Automated scans tracking retail price glitches, clearance liquidation, and limited-time doorbuster codes across major US retailers.
                       </p>
                     </div>
                   </div>
@@ -342,7 +342,7 @@ const itemListSchema = {
                       rel="noopener" 
                       class="w-full py-2.5 px-3 bg-rose-600 hover:bg-rose-500 text-white rounded-xl text-xs font-black flex items-center justify-center gap-1.5 transition-all shadow-md group-hover:scale-[1.02]"
                     >
-                      <span>Explore 365 Deals</span>
+                      <span>View Today's Doorbusters</span>
                       <span>→</span>
                     </a>
                   </div>
