@@ -1,8 +1,8 @@
 const fs = require('fs');
 const path = require('path');
 
-const dealsPath = '/Users/maloneymarketing/Documents/antigravity/gpu_hardware_radar/data/deals.json';
-const compPath = '/Users/maloneymarketing/Documents/antigravity/gpu_hardware_radar/data/comparisons.json';
+const dealsPath = path.resolve(__dirname, '../../data/deals.json');
+const compPath = path.resolve(__dirname, '../../data/comparisons.json');
 
 const deals = JSON.parse(fs.readFileSync(dealsPath, 'utf-8'));
 

@@ -1,7 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 
-const BASE_DIR = '/Users/maloneymarketing/Documents/antigravity/gpu_hardware_radar';
+const BASE_DIR = path.resolve(__dirname, '../..');
 const dealsPath = path.join(BASE_DIR, 'data/deals.json');
 const compPath = path.join(BASE_DIR, 'data/comparisons.json');
 const bestPath = path.join(BASE_DIR, 'data/clark_best_deals.json');

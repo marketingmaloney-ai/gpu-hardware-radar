@@ -2,7 +2,7 @@ const puppeteer = require('puppeteer');
 const fs = require('fs');
 const path = require('path');
 
-const BASE_DIR = '/Users/maloneymarketing/Documents/antigravity/gpu_hardware_radar';
+const BASE_DIR = path.resolve(__dirname, '../..');
 const TAG = 'priceradar04-20';
 
 const CATEGORIES = [
