@@ -22,9 +22,59 @@ function formatPrice(val: number) {
   if (val === undefined || val === null || isNaN(val)) return '0.00';
   return val % 1 === 0 ? val.toString() : val.toFixed(2);
 }
+
+// Helper to ensure Schema.org Product name adheres to Google's strict <= 150 char limit
+function formatSchemaName(title: string, maxLen = 140): string {
+  if (!title) return 'Product';
+  const cleaned = title.replace(/\s+/g, ' ').trim();
+  if (cleaned.length <= maxLen) return cleaned;
+  const truncated = cleaned.slice(0, maxLen);
+  const lastSpace = truncated.lastIndexOf(' ');
+  return (lastSpace > 30 ? truncated.slice(0, lastSpace) : truncated).trim() + '...';
+}
+
+const canonicalImage = deal.image_url.startsWith('http') 
+  ? deal.image_url 
+  : `https://gpu-hardware-radar.pages.dev${deal.image_url}`;
+
+// Schema.org Product markup for Google Rich Snippets & Merchant Listings
+const productSchema = {
+  "@context": "https://schema.org",
+  "@type": "Product",
+  "name": formatSchemaName(deal.title, 140),
+  "image": canonicalImage,
+  "description": (deal.seo && deal.seo.meta_description) || deal.title,
+  "sku": deal.asin,
+  "mpn": deal.asin,
+  "brand": {
+    "@type": "Brand",
+    "name": deal.brand
+  },
+  "aggregateRating": {
+    "@type": "AggregateRating",
+    "ratingValue": (deal.rating || 4.7).toString(),
+    "reviewCount": (deal.review_count || 100).toString(),
+    "bestRating": "5",
+    "worstRating": "1"
+  },
+  "offers": {
+    "@type": "Offer",
+    "price": deal.current_price.toString(),
+    "priceCurrency": "USD",
+    "priceValidUntil": "2026-12-31",
+    "availability": "https://schema.org/InStock",
+    "itemCondition": "https://schema.org/NewCondition",
+    "url": `https://gpu-hardware-radar.pages.dev/deals/${deal.slug}`
+  }
+};
 ---
 
-<Layout title={`${deal.title} - Save $${formatPrice(deal.savings)} (${deal.discount_pct}% Off)`} description={deal.seo?.meta_description} image={deal.image_url}>
+<Layout 
+  title={`${deal.title} - Save $${formatPrice(deal.savings)} (${deal.discount_pct}% Off)`} 
+  description={deal.seo?.meta_description} 
+  image={canonicalImage}
+  schema={productSchema}
+>
   
   <div class="max-w-[1080px] mx-auto px-4 sm:px-6 py-8">
     

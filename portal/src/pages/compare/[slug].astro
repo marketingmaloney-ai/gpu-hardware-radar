@@ -24,9 +24,61 @@ function formatPrice(val: number) {
   if (val === undefined || val === null || isNaN(val)) return '0.00';
   return val % 1 === 0 ? val.toString() : val.toFixed(2);
 }
+
+// Helper to ensure Schema.org Product name adheres to Google's strict <= 150 char limit
+function formatSchemaName(title: string, maxLen = 140): string {
+  if (!title) return 'Product';
+  const cleaned = title.replace(/\s+/g, ' ').trim();
+  if (cleaned.length <= maxLen) return cleaned;
+  const truncated = cleaned.slice(0, maxLen);
+  const lastSpace = truncated.lastIndexOf(' ');
+  return (lastSpace > 30 ? truncated.slice(0, lastSpace) : truncated).trim() + '...';
+}
+
+// Schema.org Structured Data
+const schema = {
+  "@context": "https://schema.org/",
+  "@type": "ProductModel",
+  "name": formatSchemaName(comp.title, 140),
+  "description": `Direct side-by-side comparison of ${a.title} vs ${b.title}`,
+  "category": comp.category_name || "PC Hardware",
+  "isSimilarTo": [
+    {
+      "@type": "Product",
+      "name": formatSchemaName(a.title, 140),
+      "image": a.image_url && a.image_url.startsWith('http') ? a.image_url : `https://gpu-hardware-radar.pages.dev${a.image_url || ''}`,
+      "brand": { "@type": "Brand", "name": a.brand },
+      "offers": {
+        "@type": "Offer",
+        "price": (a.current_price || a.price || '0').toString(),
+        "priceCurrency": "USD",
+        "priceValidUntil": "2026-12-31",
+        "availability": "https://schema.org/InStock",
+        "url": `https://gpu-hardware-radar.pages.dev/deals/${a.slug}`
+      }
+    },
+    {
+      "@type": "Product",
+      "name": formatSchemaName(b.title, 140),
+      "image": b.image_url && b.image_url.startsWith('http') ? b.image_url : `https://gpu-hardware-radar.pages.dev${b.image_url || ''}`,
+      "brand": { "@type": "Brand", "name": b.brand },
+      "offers": {
+        "@type": "Offer",
+        "price": (b.current_price || b.price || '0').toString(),
+        "priceCurrency": "USD",
+        "priceValidUntil": "2026-12-31",
+        "availability": "https://schema.org/InStock",
+        "url": `https://gpu-hardware-radar.pages.dev/deals/${b.slug}`
+      }
+    }
+  ]
+};
 ---
 
-<Layout title={`${comp.title} - Hardware Head-to-Head Comparison`}>
+<Layout 
+  title={`${comp.title} - Hardware Head-to-Head Comparison`}
+  schema={schema}
+>
   
   <div class="max-w-[1280px] mx-auto px-4 sm:px-6 py-8">
     

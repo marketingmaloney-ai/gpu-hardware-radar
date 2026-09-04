@@ -34,9 +34,48 @@ const categories = [
 ];
 
 const brands = [...new Set(deals.map((d: any) => d.brand))].slice(0, 10);
+
+// Helper to ensure Schema.org Product name adheres to Google's strict <= 150 char limit
+function formatSchemaName(title: string, maxLen = 140): string {
+  if (!title) return 'Product';
+  const cleaned = title.replace(/\s+/g, ' ').trim();
+  if (cleaned.length <= maxLen) return cleaned;
+  const truncated = cleaned.slice(0, maxLen);
+  const lastSpace = truncated.lastIndexOf(' ');
+  return (lastSpace > 30 ? truncated.slice(0, lastSpace) : truncated).trim() + '...';
+}
+
+// Schema.org ItemList for Rich Snippets (Top 50 Deals)
+const itemListSchema = {
+  "@context": "https://schema.org",
+  "@type": "ItemList",
+  "name": "Verified GPU & PC Hardware Deals | 90-Day Historic Lows",
+  "description": "Scanning Amazon for verified 90-day historic lows and genuine discounts on NVIDIA RTX 40-series, AMD Radeon, Ryzen CPUs, and high-performance PC hardware.",
+  "itemListElement": deals.slice(0, 50).map((deal: any, index: number) => ({
+    "@type": "ListItem",
+    "position": index + 1,
+    "item": {
+      "@type": "Product",
+      "name": formatSchemaName(deal.title, 140),
+      "image": deal.image_url && deal.image_url.startsWith('http') ? deal.image_url : `https://gpu-hardware-radar.pages.dev${deal.image_url || ''}`,
+      "description": (deal.seo && deal.seo.meta_description) || deal.title,
+      "sku": deal.asin,
+      "offers": {
+        "@type": "Offer",
+        "price": (deal.current_price || deal.price || '0').toString(),
+        "priceCurrency": "USD",
+        "availability": "https://schema.org/InStock",
+        "url": `https://gpu-hardware-radar.pages.dev/deals/${deal.slug}`
+      }
+    }
+  }))
+};
 ---
 
-<Layout title="Verified GPU & PC Hardware Deals | 90-Day Historic Lows">
+<Layout 
+  title="Verified GPU & PC Hardware Deals | 90-Day Historic Lows"
+  schema={itemListSchema}
+>
 
   <div class="px-4 sm:px-6 py-6">
     
